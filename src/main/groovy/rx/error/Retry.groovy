@@ -2,12 +2,12 @@ package rx.error
 
 import rx.Observable
 
-def mustFail = true
+def attempts = 0
 
 def getUser = {
-	if (mustFail) {
+	if (attempts < 3) {
 		println 'Failed!'
-		mustFail = false
+		attempts++
 		throw new RuntimeException('Any error')
 	}
 	Observable.just(it)
@@ -16,4 +16,4 @@ def getUser = {
 Observable.just(1)
 	.flatMap(getUser)
 	.retry(3)
-	.subscribe { println "Even number received: $it" }
+	.subscribe { println "Event received: $it" }

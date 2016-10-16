@@ -10,7 +10,7 @@ def getUser = {
 	println 'Trying to get the User...'
 	if (mustFail) {
 		println 'Failed!'
-//		mustFail = false
+		mustFail = false
 		throw new RuntimeException('Any error')
 	}
 	Observable.just(it)
@@ -30,6 +30,6 @@ Observable.just(1)
 			}
 		}
 	})
-	.subscribe { println "Even number received: $it" }
+	.subscribe { println "Event received: $it" }
 
 	sleep(5000)
