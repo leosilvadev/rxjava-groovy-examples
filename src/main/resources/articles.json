@@ -5,4 +5,25 @@
 		"author": "User 1",
 		"publishedAt": "2016-01-01"
 	}
-}]
+}, {
+	"title": "Article 2",
+	"link": "http://google.com/?q=article1",
+	"metadata": {
+		"author": "User 2",
+		"publishedAt": "2016-01-01"
+	}
+}, {
+	"title": "Article 3",
+	"link": "http://google.com/?q=article1",
+	"metadata": {
+		"author": "User 1",
+		"publishedAt": "2016-01-01"
+	}
+}, {
+	"title": "Article 4",
+	"link": "http://google.com/?q=article1",
+	"metadata": {
+		"author": "User 2",
+		"publishedAt": "2016-01-01"
+	}
+}, ]
