@@ -5,18 +5,20 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.context.request.async.DeferredResult
 
-import rx.spring.repository.ArticleRepository
+import rx.spring.service.ArticleService
 
 @RestController
 @RequestMapping('/v1/articles')
 class ArticleController {
 
 	@Autowired
-	ArticleRepository articleRepository
+	ArticleService articleService
 
 	@GetMapping
 	def list() {
-		ResponseEntity.ok(articleRepository.findAll())
+		def df = new DeferredResult(3000)
+		articleService.findAll().map(ResponseEntity.&ok)
 	}
 }
