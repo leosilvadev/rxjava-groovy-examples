@@ -22,8 +22,7 @@ class ObservableReturnValueHandler implements HandlerMethodReturnValueHandler {
 		}
 
 		final DeferredResult deferredResult = new DeferredResult()
-		Observable observable = (Observable) returnValue
-		observable.subscribe({ result ->
+		returnValue.subscribe({ result ->
 			deferredResult.setResult(result)
 		}, { errors ->
 			deferredResult.setErrorResult(errors)

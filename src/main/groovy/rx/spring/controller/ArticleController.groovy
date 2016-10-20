@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+import rx.Observable
+import rx.spring.exceptions.BadRequestException
 import rx.spring.service.ArticleService
 
 @RestController
@@ -17,6 +19,15 @@ class ArticleController {
 
 	@GetMapping
 	def list() {
-		articleService.findAll().map(ResponseEntity.&ok)
+		articleService.findAll()
+				.flatMap({
+					Observable.error(new BadRequestException('teste'))
+				})
+				.map(toJson)
+				.map(ResponseEntity.&ok)
+	}
+
+	private toJson = { articles ->
+		articles.collect { it.properties.subMap(['title', 'link']) }
 	}
 }
