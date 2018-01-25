@@ -7,57 +7,63 @@ import rx.Observable
 import rx.Subscriber
 import rx.schedulers.Schedulers
 
-def sqlInsert = 'insert into articles (title, link, metadata) values (?, ?, ?::jsonb)'
+class Articles {
 
-def dbUrl      = "jdbc:postgresql://localhost/rxjava"
-def dbUser     = "test"
-def dbPassword = "test"
-def dbDriver   = "org.postgresql.Driver"
+	static main(args) {
+		def sqlInsert = 'insert into articles (title, link, metadata) values (?, ?, ?::jsonb)'
 
-def sql = Sql.newInstance(dbUrl, dbUser, dbPassword, dbDriver)
+		def dbUrl      = "jdbc:postgresql://localhost/rxjava"
+		def dbUser     = "test"
+		def dbPassword = "test"
+		def dbDriver   = "org.postgresql.Driver"
 
-Observable getArticles = Observable.create { Subscriber sub ->
-	try {
-		def json = new URL('https://raw.githubusercontent.com/leosilvadev/rxjava-groovy-examples/master/src/main/resources/articles.json').text
-		def articles = new JsonSlurper().parseText(json)
-		log "Articles found: $articles"
-		sub.onNext articles
-		sub.onCompleted()
-	} catch(ex) {
-		sub.onError ex
-	}
-}
+		def sql = Sql.newInstance(dbUrl, dbUser, dbPassword, dbDriver)
 
-def splitThem = { articles ->
-	log "Splitting ${articles.size()} articles..."
-	Observable.from(*articles)
-}
-
-def insertIt = { article ->
-	Observable.create { Subscriber sub ->
-		try {
-			log "Inserting Articles $article.title"
-			sql.execute(sqlInsert, article.title, article.link, JsonOutput.toJson(article.metadata))
-			sleep 1000
-			sub.onNext article
-			sub.onCompleted()
-		} catch(ex) {
-			sub.onError ex
+		Observable getArticles = Observable.defer {
+			try {
+				def json = new URL('https://raw.githubusercontent.com/leosilvadev/rxjava-groovy-examples/master/src/main/resources/articles.json').text
+				def articles = new JsonSlurper().parseText(json)
+				log "Articles found: $articles"
+				Observable.just(articles)
+			} catch(ex) {
+				Observable.error(ex)
+			}
 		}
-	}.subscribeOn(Schedulers.computation())
-}
 
-getArticles
-	.subscribeOn(Schedulers.io())
-	.observeOn(Schedulers.computation())
-	.flatMap(splitThem)
-	.flatMap(insertIt)
-	.subscribe { article ->
-		log "Article $article.title registered successfully"
+		def splitThem = { articles ->
+			log "Splitting ${articles.size()} articles..."
+			Observable.from(*articles)
+		}
+
+		def insertIt = { article ->
+			Observable.defer {
+				try {
+					log "Inserting Articles $article.title"
+					sql.execute(sqlInsert, article.title, article.link, JsonOutput.toJson(article.metadata))
+					sleep 1000
+					Observable.just article
+
+				} catch(ex) {
+					Observable.error ex
+
+				}
+			}.subscribeOn(Schedulers.computation())
+		}
+
+		getArticles
+			.subscribeOn(Schedulers.io())
+			.observeOn(Schedulers.computation())
+			.flatMap(splitThem)
+			.flatMap(insertIt)
+			.subscribe { article ->
+				log "Article $article.title registered successfully"
+			}
+
+		sleep 3000
 	}
-	
-def log(message) {
-	println "Thread ${Thread.currentThread().name}: $message"
-}
 
-sleep 3000
+	static log(message) {
+		println "Thread ${Thread.currentThread().name}: $message"
+	}
+
+}

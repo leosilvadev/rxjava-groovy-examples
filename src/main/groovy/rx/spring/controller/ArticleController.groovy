@@ -20,9 +20,9 @@ class ArticleController {
 	@GetMapping
 	def list() {
 		articleService.findAll()
-				.flatMap({
-					Observable.error(new BadRequestException('teste'))
-				})
+//				.flatMap({
+//					Observable.error(new BadRequestException('test'))
+//				})
 				.map(toJson)
 				.map(ResponseEntity.&ok)
 	}

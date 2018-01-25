@@ -1,12 +1,11 @@
 package rx.spring
 
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
 @SpringBootApplication
-class Application {
+class SpringApplication {
 
 	static main(args) {
-		SpringApplication.run Application, args
+		org.springframework.boot.SpringApplication.run SpringApplication, args
 	}
 }

@@ -2,5 +2,10 @@ package rx.creation
 
 import rx.Observable
 
-Observable.from(*[1..100])
-	.subscribe { println "Event received: $it" }
+class From {
+	static main(args) {
+		Observable.from(*[1..100])
+			.map { it * 2 }
+			.subscribe { println "[${Thread.currentThread().name}] Event received: $it" }
+	}
+}

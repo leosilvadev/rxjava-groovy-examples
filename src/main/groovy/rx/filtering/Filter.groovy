@@ -2,8 +2,10 @@ package rx.filtering
 
 import rx.Observable
 
-Observable.just(10)
-	.map { it + 20 }
-	.map { it * 2 }
-	.map { [number: it] }
-	.subscribe { println "Event received: $it" }
+class Filter {
+	static main(args) {
+		Observable.just(11)
+			.filter { it % 2 == 0}
+			.subscribe { println "Event received: $it" }
+	}
+}
